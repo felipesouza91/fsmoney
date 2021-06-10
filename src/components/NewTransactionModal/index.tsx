@@ -4,7 +4,8 @@ import { Container, TransactionTypeContainer, RadioBox } from './styles';
 import close from '../../assets/close.svg';
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
-import { api } from '../../services/api';
+import { useTransactions } from '../../hooks/useTransactions';
+
 interface NewTransactionModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
@@ -14,20 +15,16 @@ const NewTransactionModal: React.FC<NewTransactionModalProps> = ({
   isOpen,
   onRequestClose,
 }) => {
+  const { saveNewTransaction } = useTransactions();
   const [type, setType] = useState('deposit');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState('');
 
-  function handleCreateNewTransaction(event: FormEvent) {
+  async function handleCreateNewTransaction(event: FormEvent) {
     event.preventDefault();
-    const data = {
-      title,
-      type,
-      amount,
-      category,
-    };
-    api.post('transactions', data);
+    await saveNewTransaction({ amount, category, title, type });
+    onRequestClose();
   }
   return (
     <Modal
